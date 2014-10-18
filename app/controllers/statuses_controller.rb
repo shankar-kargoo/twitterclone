@@ -1,16 +1,17 @@
 class StatusesController < ApplicationController
 
+	before_action :require_user, onlyl: [:new, :create]
+
 	def new
 		@status = Status.new
 	end
 
 	def create
 		@status = Status.new(status_params)
-		user = User.find 1
-		@status.creator = user #TODO update this after authentication
+		@status.creator = current_user
 		if @status.save
 			flash[:notice] = "Status Created"
-			redirect_to user_path(user.username)
+			redirect_to user_path(@status.creator.username)
 		else
 			flash[:errors]
 			render :new
@@ -23,6 +24,7 @@ class StatusesController < ApplicationController
 	def status_params
 		params.require(:status).permit(:body)
 	end
+
 
 
 end
